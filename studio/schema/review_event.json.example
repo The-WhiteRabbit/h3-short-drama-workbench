@@ -1,8 +1,0 @@
-{
-  "event": "clip_approved",
-  "asset_id": "video_EP001_SH001_v002",
-  "previous_status": "candidate",
-  "new_status": "approved",
-  "operator": "local_user",
-  "timestamp": "2026-09-19T22:00:00"
-}

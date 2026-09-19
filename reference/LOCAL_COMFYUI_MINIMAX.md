@@ -30,7 +30,7 @@ python scripts/h3_storyboard.py export /绝对路径/storyboard.json --unit H3-0
 python scripts/h3_storyboard.py export /绝对路径/storyboard.json --unit H3-001 --approval /绝对路径/H3-001-approved-r1.json --input-dir /Users/jimboy/code/RedApple/ComfyUI/input --out /绝对路径/H3-001-job.json
 ```
 
-输出为 API 任务包（内含 `prompt` 图、上传映射、状态），不是 UI 画布 JSON。`--input-dir` 将参考素材复制到 ComfyUI input 的 `tudou/<单元>/` 下，以内容哈希命名避免同名冲突；默认无此选项时不复制。缺预览图可以导出标明不可投产的草稿，但实际 references 与提示词文件仍须可读。正式任务需要当前确认文件。API Key 始终留空，不能把这个包直接拖进画布或声称已经运行。
+输出为 API 任务包（内含 `prompt` 图、上传映射、状态），不是 UI 画布 JSON。`--input-dir` 将参考素材复制到 ComfyUI input 的 `h3-short-drama/<单元>/` 下，以内容哈希命名避免同名冲突；默认无此选项时不复制。缺预览图可以导出标明不可投产的草稿，但实际 references 与提示词文件仍须可读。正式任务需要当前确认文件。API Key 始终留空，不能把这个包直接拖进画布或声称已经运行。
 
 ## 提交、续查与失败
 

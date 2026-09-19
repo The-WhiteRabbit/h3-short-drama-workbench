@@ -1,0 +1,174 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>H3 · 短剧审核工作台</title>
+<style>
+:root{--bg:#f4f6f8;--surface:#fff;--ink:#202931;--muted:#697783;--line:#dce3e8;--accent:#206858;--tint:#eaf4ef;--red:#a23c3c;--orange:#946519;--radius:10px;font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;color:var(--ink);background:var(--bg);font-size:14px;line-height:1.6}
+*{box-sizing:border-box}[hidden]{display:none!important}body{margin:0}button,input,select,textarea{font:inherit}button,a,input,select,textarea{outline-offset:3px}button{cursor:pointer;border:1px solid var(--line);background:white;border-radius:7px;padding:8px 13px;color:var(--ink);font-size:13px;line-height:1.5;font-weight:550}button:hover{border-color:var(--accent);background:var(--tint)}button:disabled{opacity:.42;cursor:not-allowed}button.primary{background:var(--accent);color:white;border-color:var(--accent)}button.danger{color:var(--red)}a{color:var(--accent);text-underline-offset:3px}h1,h2,h3,p{margin:0}h1{font-size:25px;letter-spacing:-.6px;line-height:1.35}h2{font-size:18px}h3{font-size:15px}small,.muted{color:var(--muted)}.mono,code,pre{font-family:ui-monospace,SFMono-Regular,Consolas,"Liberation Mono",monospace}pre{white-space:pre-wrap;overflow-wrap:anywhere;font-size:13px;line-height:1.85}input,select,textarea{border:1px solid var(--line);padding:9px 10px;border-radius:6px;background:white;color:var(--ink);min-width:0}textarea{resize:vertical}input[type=search]{width:310px;max-width:100%}
+header{height:76px;display:flex;align-items:center;justify-content:space-between;gap:20px;padding:0 30px;background:var(--surface);border-bottom:1px solid var(--line)}.brand{font-size:19px;font-weight:750;letter-spacing:-.3px}.brand small{font-weight:450;font-size:12px;margin-left:16px}.live{font-size:12px;color:var(--accent);display:flex;align-items:center;gap:7px}.live:before{content:"";width:7px;height:7px;background:currentColor;border-radius:50%}.shell{display:grid;grid-template-columns:228px minmax(0,1fr);min-height:calc(100vh - 76px)}aside{background:#fafbfc;border-right:1px solid var(--line);padding:26px 16px;display:flex;flex-direction:column;gap:12px}.aside-title{font-size:12px;color:var(--muted);margin:0 12px 4px}.ep-button{width:100%;text-align:left;background:transparent;border-color:transparent;padding:12px;display:flex;flex-direction:column;gap:4px}.ep-button.active{background:var(--tint);border-color:#caddd2}.ep-button .mono{font-size:11px;letter-spacing:.5px;color:var(--muted)}.ep-button strong{font-weight:600}.aside-foot{margin-top:auto;padding:32px 12px 0;font-size:12px;color:var(--muted);line-height:1.8}main{max-width:1530px;width:100%;padding:30px 34px 40px;margin:0 auto;min-width:0}.heading{display:flex;justify-content:space-between;align-items:flex-start;gap:20px}.heading p{color:var(--muted);margin-top:8px;font-size:13px}.toolbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center}.progress{display:flex;gap:28px;flex-wrap:wrap;margin:24px 0 20px;padding:17px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}.step{display:flex;gap:10px;align-items:center}.step-number{width:26px;height:26px;border:1px solid #cdd8d4;border-radius:50%;display:grid;place-items:center;font-size:12px;color:var(--accent)}.step span:last-child{font-size:12px;margin-left:8px}.tabs{display:flex;gap:27px;margin:0 0 23px;border-bottom:1px solid var(--line);overflow-x:auto}.tabs button{border:0;background:transparent;border-radius:0;padding:10px 0 13px;white-space:nowrap;color:var(--muted);font-size:14px;font-weight:600;border-bottom:2px solid transparent}.tabs button.active{color:var(--accent);border-bottom-color:var(--accent)}.panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden}.panel-head{padding:18px 22px;display:flex;justify-content:space-between;gap:12px;align-items:center;border-bottom:1px solid var(--line)}.panel-body{padding:22px}.panel-foot{padding:18px 22px;border-top:1px solid var(--line);background:#fcfdfd}.review-line{display:flex;align-items:center;gap:10px;flex-wrap:wrap}.review-line input{flex:1;min-width:200px}.status{font-size:11px!important;padding:3px 7px;border-radius:4px;white-space:nowrap;background:#edf0f3;color:var(--muted);font-weight:500}.status.approved{background:#e6f2e9;color:#286747}.status.stale,.status.pending{background:#fff4db;color:var(--orange)}.status.rejected,.status.missing{background:#fdebea;color:var(--red)}.status.blocked{background:#edf0f3;color:#697783}.split{display:grid;grid-template-columns:minmax(215px,.65fr) minmax(0,1.6fr);gap:20px;align-items:start}.shot-list{padding:6px}.shot-button{display:block;width:100%;border-color:transparent;text-align:left;border-radius:6px;margin:4px 0;padding:13px}.shot-button.active{background:var(--tint);border-color:#caddd2}.shot-top{display:flex;justify-content:space-between;align-items:center;gap:5px;margin-bottom:6px}.shot-top code{font-size:11px;color:var(--muted)}.shot-title{font-size:14px;font-weight:600}.shot-length{font-size:11px;color:var(--muted);margin-top:4px}.preview-layout{display:grid;grid-template-columns:minmax(160px,230px) minmax(0,1fr);gap:22px;align-items:start}.media-box{background:#edf1f3;display:flex;align-items:center;justify-content:center;border:1px solid var(--line);border-radius:7px;overflow:hidden;min-height:230px;aspect-ratio:9/16;width:100%;max-height:410px}.media-box video,.media-box img{display:block;width:100%;height:100%;max-height:410px;object-fit:contain;background:#162127}.empty-media{padding:22px;text-align:center;color:var(--muted);font-size:13px}.details{min-width:0}.details h3{margin-bottom:8px}.details p{font-size:13px}.details .path{font-size:11px;word-break:break-all;margin:12px 0;color:var(--muted)}.version-control{margin-top:16px}.version-control label{display:block;font-size:12px;color:var(--muted);margin-bottom:6px}.version-control select{display:block;width:100%;font-size:12px;margin-bottom:8px}.version-control button{width:100%}.prompt{border-top:1px solid var(--line);padding-top:18px;margin-top:20px}.prompt-head{display:flex;justify-content:space-between;align-items:center;gap:12px}.prompt pre{max-height:280px;overflow:auto;font-size:12px;color:#46525b}.prompt small{display:block;overflow-wrap:anywhere;margin-top:8px}.alert{padding:12px 16px;border:1px solid #e6d4a4;background:#fff8e6;color:#805e16;border-radius:7px;margin-bottom:18px;display:flex;justify-content:space-between;align-items:center;gap:15px;font-size:13px}.alert.error{background:#fff0ef;color:#9c3737;border-color:#e6bcba;white-space:pre-wrap;overflow-wrap:anywhere}.alert[hidden]{display:none}.empty{padding:55px 22px;text-align:center;color:var(--muted)}.file-summary{margin:10px 0 16px;font-size:12px;color:var(--muted)}.table-wrap{overflow:auto;background:white;border:1px solid var(--line);border-radius:8px}table{border-collapse:collapse;width:100%;font-size:12px}th{text-align:left;padding:12px 14px;background:#fafbfc;font-weight:550;color:var(--muted);white-space:nowrap}td{padding:12px 14px;border-top:1px solid #edf0f2;vertical-align:middle}td.path-cell{max-width:550px;min-width:200px;overflow-wrap:anywhere;font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:11px}td.actions{white-space:nowrap}td.actions button{padding:5px 8px;font-size:11px}.file-hash{font-family:monospace;color:var(--muted)}footer{font-size:11px;color:var(--muted);margin-top:24px;line-height:1.8}.toast{position:fixed;bottom:25px;left:50%;transform:translateX(-50%);padding:12px 20px;border-radius:8px;background:#20372f;color:white;font-size:13px;z-index:20;max-width:90vw;box-shadow:0 5px 30px #162a3322}.toast[hidden]{display:none}dialog{width:min(940px,95vw);max-height:92vh;border:1px solid var(--line);border-radius:12px;padding:0;box-shadow:0 15px 70px #0f192a33}dialog::backdrop{background:#19273477}dialog .panel-head{min-width:0}dialog h3{overflow-wrap:anywhere;font-size:13px}dialog textarea{width:100%;height:55vh;display:block;font-family:ui-monospace,Consolas,monospace;font-size:13px;line-height:1.75;tab-size:2}dialog .panel-foot{display:flex;justify-content:space-between;gap:14px;align-items:center}dialog .panel-foot small{max-width:65%;font-size:11px}.read-only-text{white-space:pre-wrap;max-height:58vh;overflow:auto;margin:0}details>summary{cursor:pointer;font-size:12px;color:var(--muted);margin-bottom:12px}#intro-note{font-size:12px;color:var(--muted);line-height:1.9;margin-bottom:18px}
+@media(min-width:1550px){main{padding-top:36px}.preview-layout{grid-template-columns:245px 1fr}}
+@media(max-width:1100px){main{padding:24px}.shell{grid-template-columns:190px minmax(0,1fr)}.split{grid-template-columns:190px minmax(0,1fr);gap:14px}.preview-layout{grid-template-columns:1fr}.media-box{max-width:210px;max-height:340px;margin:auto}.heading{flex-direction:column}.progress{gap:15px}.panel-body{padding:18px}}
+@media(max-width:700px){header{height:auto;min-height:66px;padding:14px 18px}.brand{font-size:16px}.brand small{display:none}.live{font-size:11px}.shell{display:block}aside{padding:10px 14px;border-right:0;border-bottom:1px solid var(--line);display:block}.aside-title,.aside-foot{display:none}#episode-nav{display:flex;gap:8px;overflow:auto}.ep-button{min-width:155px;width:auto;padding:8px 10px}.ep-button strong{font-size:12px}main{padding:20px 16px}h1{font-size:22px}.progress{gap:12px;flex-direction:column;margin-top:20px}.step{font-size:13px}.tabs{gap:22px}.split{display:block}.shot-list{display:flex;overflow:auto;margin-bottom:16px}.shot-button{min-width:205px;margin:3px;flex:0 0 auto;width:205px}.shot-top{align-items:flex-start;flex-direction:column}.shot-top code{white-space:nowrap}.preview-layout{display:block}.media-box{max-width:220px;margin:0 auto 20px}.panel-head,.panel-body,.panel-foot{padding:16px}.panel-head{flex-wrap:wrap}.review-line{align-items:stretch}.review-line input{flex-basis:100%;min-width:0}.review-line button{flex:1}.alert{align-items:flex-start;flex-direction:column}.toolbar{width:100%}.toolbar input{width:100%}.file-summary{line-height:1.8}dialog .panel-foot{flex-direction:column;align-items:stretch}dialog .panel-foot small{max-width:none}}
+@media(prefers-reduced-motion:no-preference){button{transition:background .12s ease,border-color .12s ease}}
+.mono,small,#project-root{overflow-wrap:anywhere}.panel,.panel-body,.prompt{min-width:0}input[type=file],select{max-width:100%}.media-box{aspect-ratio:16/9;min-height:120px;max-height:320px}.preview-layout{grid-template-columns:minmax(160px,320px) minmax(0,1fr)}@media(max-width:700px){.preview-layout{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<header><div class="brand">H3 · 短剧工作台<small>本地资产与人工审核</small></div><div id="connection" class="live" role="status">正在连接本地目录</div></header>
+<div class="shell">
+<aside><div class="aside-title">项目分集</div><nav id="episode-nav" aria-label="分集选择"></nav><div class="aside-foot">文件是源数据。<br>页面只负责读取和审核。<br><br>分镜通过自动提交 H3。<br>Agent 按单元推进创作。</div></aside>
+<main>
+<div class="heading"><div><h1 id="project-title">正在读取项目…</h1><p id="subtitle">读取磁盘中的 project.json 与各分集文件</p></div><div class="toolbar"><button id="rescan">重新核对文件</button><button id="export">导出资产清单</button></div></div>
+<div class="progress" id="progress"></div>
+<div class="alert" id="changes" hidden><span>磁盘文件已变化。为保留正在编辑或播放的内容，尚未切换预览。</span><button id="apply-changes">载入最新文件</button></div>
+<div class="alert error" id="errors" hidden role="alert"></div>
+<div class="panel-body"><small id="project-root" class="mono"></small><p id="next-action" style="margin-top:8px"></p></div><nav class="tabs" aria-label="审核阶段"><button data-tab="script" class="active">剧本分集</button><button data-tab="assets">角色与素材</button><button data-tab="board">单元分镜审核</button><button data-tab="video">单元视频审核</button><button data-tab="files">资产文件</button></nav>
+<section id="content" aria-live="polite"><div class="empty">加载中…</div></section>
+<footer>每 2 秒读取目录变化 · 原文件改动会使相关审核失效 · 自动更新不会重新生成 HTML<br>分镜通过并生成会提交一次 H3 任务 · 不自动剪辑 · 创作修改由 Agent 处理。</footer>
+</main>
+</div>
+<div id="toast" class="toast" role="status" hidden></div>
+<dialog id="editor"><div class="panel-head"><h3 id="editor-title"></h3><button id="editor-close">关闭</button></div><div class="panel-body"><textarea id="editor-text" spellcheck="false" aria-label="文件内容"></textarea><pre id="viewer-text" class="read-only-text" hidden></pre></div><div class="panel-foot"><small id="editor-info">保存前检查文件版本；原内容自动备份到 history 目录。</small><button id="editor-save" class="primary">保存到本地文件</button></div></dialog>
+<script>
+'use strict';
+const $ = (id) => document.getElementById(id);
+const S = {data:null, pending:null, episode:null, shot:null, tab:'script', token:'', query:'', poll:false, rendering:0, editing:null, dirty:false, note:'', busy:false};
+const statusText = {approved:'已通过',rejected:'已退回',stale:'内容已变 · 待重审',pending:'待审核',blocked:'等待上游通过',missing:'缺少文件'};
+const escapeHTML = (value) => String(value ?? '').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const badge = (gate) => `<span class="status ${escapeHTML(gate.state)}">${escapeHTML(statusText[gate.state] || gate.state)}</span>`;
+const fileURL = (f) => '/files/' + f.path.split('/').map(encodeURIComponent).join('/') + '?v=' + encodeURIComponent(f.hash || '');
+const bytes = (n) => n > 1048576 ? (n/1048576).toFixed(1)+' MB' : n > 1024 ? (n/1024).toFixed(1)+' KB' : n+' B';
+const currentEpisode = () => S.data?.episodes.find(e=>e.id===S.episode);
+const currentShot = () => currentEpisode()?.shots.find(s=>s.id===S.shot);
+function toast(message){$('toast').textContent=message;$('toast').hidden=false;clearTimeout(toast.timer);toast.timer=setTimeout(()=>$('toast').hidden=true,4500);}
+async function request(path, options={}){const r=await fetch(path,{cache:'no-store',...options});let result;try{result=await r.json();}catch{throw Error('本地服务返回了无法解析的内容');}if(!r.ok)throw Error(result.error||'请求失败');return result;}
+async function post(data){return request('/api/action',{method:'POST',headers:{'Content-Type':'application/json','X-Review-Token':S.token},body:JSON.stringify(data)});}
+async function getText(f){if(!f?.path||!f.hash)return '（文件缺失）';const r=await request('/api/text?path='+encodeURIComponent(f.path)+'&v='+encodeURIComponent(f.hash));return r.text;}
+function isPlaying(){return [...document.querySelectorAll('video,audio')].some(v=>!v.paused&&!v.ended);}
+function holdRefresh(){return $('editor').open||isPlaying()||Boolean(S.note)||S.busy;}
+function hasBlocker(gate){return ['blocked','missing'].includes(gate.state);}
+
+async function sync(force=false){
+ if(S.poll)return;S.poll=true;
+ try{const data=await request('/api/project');$('connection').textContent='本地文件已连接';$('connection').style.color='';$('errors').hidden=!data.errors.length;$('errors').textContent=data.errors.join('\n');
+  if(!S.data||data.revision!==S.data.revision){
+   if(!force&&S.data&&holdRefresh()){S.pending=data;$('changes').hidden=false;}
+   else{S.data=data;S.pending=null;$('changes').hidden=true;render();}
+  }
+ }catch(e){$('connection').textContent='连接或文件读取异常';$('connection').style.color='var(--red)';showError(e.message);}finally{S.poll=false;}
+}
+function showError(text){$('errors').hidden=false;$('errors').textContent=text;}
+function render(){
+ const data=S.data;if(!data)return;
+ if(!data.episodes.some(e=>e.id===S.episode))S.episode=data.episodes[0]?.id;
+ const ep=currentEpisode();if(ep&&!ep.shots.some(s=>s.id===S.shot))S.shot=ep.shots[0]?.id;
+ $('project-title').textContent=data.project.title||'短剧审核工作台';
+ $('subtitle').textContent=ep?ep.id+' / '+ep.title+' · '+ep.shots.length+' 个单元':'在 episodes 目录添加 episode.json，页面会自动发现';
+ $('episode-nav').innerHTML=data.episodes.map(e=>`<button class="ep-button ${e.id===S.episode?'active':''}" data-episode="${escapeHTML(e.id)}"><span class="mono">${escapeHTML(e.id)}</span><strong>${escapeHTML(e.title)}</strong></button>`).join('');
+ $('errors').hidden=!data.errors.length;$('errors').textContent=data.errors.join('\n');
+ $('next-action').textContent=(data.project.automation?.paused?'已暂停新的视频提交。 ':'')+(data.agent_next||''); $('project-root').textContent=data.root||'';
+ document.querySelectorAll('[data-tab]').forEach(b=>{b.classList.toggle('active',b.dataset.tab===S.tab);b.setAttribute('aria-current',b.dataset.tab===S.tab?'page':'false');});
+ $('progress').innerHTML=ep?`<div class="step"><span class="step-number">1</span>剧本分集 ${badge(ep.script_gate)}</div><div class="step"><span class="step-number">2</span>素材确认 ${badge(ep.assets_gate||{state:"pending"})}</div><div class="step"><span class="step-number">3</span>单元分镜 <span>${ep.shots.filter(s=>s.board.state==='approved').length} / ${ep.shots.length} 已通过</span></div><div class="step"><span class="step-number">4</span>单元视频审核 <span>${ep.shots.filter(s=>s.clip.state==='approved').length} / ${ep.shots.length} 已通过${ep.ready_for_assembly?' · 可交接剪辑':''}</span></div>`:'';
+ const token=++S.rendering;
+ if(S.tab==='files'){renderFiles();return;}
+ if(S.tab==='assets'){renderAssets(ep);return;}
+ if(!ep){$('content').innerHTML='<div class="empty">暂无有效分集。请先检查项目配置。</div>';return;}
+ if(S.tab==='script')renderScript(ep,token);else renderShots(ep,token);
+}
+function reviewControls(stage,gate){return `<div class="review-line"><input data-note aria-label="审核意见" placeholder="审核意见（退回时必填）" value="${escapeHTML(S.note)}"><button class="danger" data-review="${stage}" data-decision="rejected" ${hasBlocker(gate)?'disabled':''}>退回修改</button><button class="primary" data-review="${stage}" data-decision="approved" ${hasBlocker(gate)?'disabled':''}>通过${stage==='script'?'此分集':stage==='assets'?'当前素材':stage==='board'?'本单元并生成':'本单元视频'}</button></div>`;}
+async function fillText(id,f,token){try{const text=await getText(f);if(token===S.rendering&&$(id))$(id).textContent=text;}catch(e){if(token===S.rendering&&$(id))$(id).textContent=e.message;}}
+function renderScript(ep,token){
+ $('content').innerHTML=`<div class="panel"><div class="panel-head"><div><h2>${escapeHTML(ep.title)}</h2><small class="mono">${escapeHTML(ep.script.path)}</small></div><div class="toolbar">${badge(ep.script_gate)}<button data-edit="${escapeHTML(ep.script.path)}">编辑剧本</button></div></div><div class="panel-body"><pre id="script-preview">正在读取剧本…</pre></div><div class="panel-foot">${reviewControls('script',ep.script_gate)}</div></div>`;
+ fillText('script-preview',ep.script,token);
+}
+function renderShots(ep,token){
+ const mode=S.tab,shot=currentShot();
+ let top=mode==='board'?`<div id="intro-note">按整个 H3 单元审核分镜图、提示词、造型和声音。通过后自动提交 H3；上传新图不会自动提交。</div><details><summary>本集精简单元规划</summary><pre id="board-overview">读取中…</pre></details>`:`<div id="intro-note">视频按整个单元验收。可以上传外部版本，选择采用；旧版本保留。</div>`;
+ if(!shot){$('content').innerHTML=top+'<div class="empty">当前没有单元。Agent 将按 plan.json 逐个创建，不预先展开全剧。</div>';return;}
+ const gate=mode==='board'?shot.board:shot.clip,media=mode==='board'?shot.image:shot.video,kind=mode==='board'?'image':'video';
+ const available=shot.candidates[kind];
+ const mediaHTML=media.hash?(kind==='video'?`<video controls playsinline preload="metadata" src="${fileURL(media)}"></video>`:`<img alt="当前分镜参考图" src="${fileURL(media)}">`):`<div class="empty-media">${kind==='video'?'尚未选择视频<br>将文件放入 videos 目录':'尚未选择图片<br>请生成或上传本单元分镜图'}</div>`;
+ $('content').innerHTML=top+`<div class="split"><div class="panel shot-list">${ep.shots.map(s=>`<button class="shot-button ${s.id===S.shot?'active':''}" data-shot="${escapeHTML(s.id)}"><div class="shot-top"><code>${escapeHTML(s.id)}</code>${badge(mode==='board'?s.board:s.clip)}</div><div class="shot-title">${escapeHTML(s.title)}</div><div class="shot-length">排序 ${escapeHTML(s.order)} · 计划 ${escapeHTML(s.duration_seconds)} 秒</div></button>`).join('')}</div><div class="panel"><div class="panel-head"><h2>${escapeHTML(shot.title)}</h2>${badge(gate)}</div><div class="panel-body"><div class="preview-layout"><div class="media-box">${mediaHTML}</div><div class="details"><h3>单元说明</h3><p>${escapeHTML(shot.description)}</p><div class="path mono">当前采用：${escapeHTML(media.path||'未选择')}<br>SHA256：${escapeHTML(media.hash?.slice(0,16)||'—')}</div>${media.hash?`<a target="_blank" rel="noopener" href="${fileURL(media)}">打开当前文件</a>`:''}<div class="version-control"><label for="version">${kind==='video'?'视频':'图片'}候选版本（${available.length}）</label><select id="version">${!available.length?'<option value="">请先放入文件</option>':available.map(f=>`<option value="${escapeHTML(f.path)}" ${f.path===media.path?'selected':''}>${escapeHTML(f.path.split('/').pop())} · ${bytes(f.bytes)}</option>`).join('')}</select><button data-select="${kind}" ${available.length?'':'disabled'}>采用所选版本</button></div></div></div><div class="prompt"><div class="prompt-head"><h3>视频提示词</h3><button data-edit="${escapeHTML(shot.prompts.video_prompt.path)}">编辑提示词</button></div><pre id="video-prompt">读取中…</pre><small class="mono">${escapeHTML(shot.prompts.video_prompt.path)}</small></div><details class="prompt"><summary>图片提示词、参数与参考资料</summary><pre id="image-prompt">读取中…</pre><div class="toolbar"><button data-edit="${escapeHTML(shot.prompts.image_prompt.path)}">编辑图片提示词</button><button data-edit="${escapeHTML(shot.prompts.params.path)}">编辑生成参数</button></div><div style="margin-top:12px">${shot.references.map(f=>`<p>${f.path.endsWith('.md')?`<button data-edit="${escapeHTML(f.path)}">编辑</button>`:''}<button data-view="${escapeHTML(f.path)}">查看参考资料</button> <small class="mono">${escapeHTML(f.path)}</small></p>`).join('')}</div></details></div><div class="panel-foot">${reviewControls(mode==='board'?'board':'video',gate)}${gate.record?`<small style="display:block;margin-top:12px">上次记录：${escapeHTML(statusText[gate.record.decision])} · ${escapeHTML(gate.record.reviewer)} · ${escapeHTML(gate.record.note||'无备注')}</small>`:''}</div></div></div>`;
+ appendUnitTools(shot,kind);
+ fillText('video-prompt',shot.prompts.video_prompt,token);fillText('image-prompt',shot.prompts.image_prompt,token);if(mode==='board')fillText('board-overview',ep.storyboard,token);
+}
+
+function preview(f){
+ if(!f.hash)return `<p>缺失：${escapeHTML(f.path)}</p>`;
+ const ext=f.path.split('.').pop().toLowerCase();
+ if(['png','jpg','jpeg','webp','gif'].includes(ext))return `<a href="${fileURL(f)}" target="_blank"><img style="width:100%;max-height:320px;object-fit:contain" src="${fileURL(f)}" alt="${escapeHTML(f.path)}"></a>`;
+ if(['mp3','wav','m4a','ogg','flac'].includes(ext))return `<audio controls preload="metadata" style="max-width:100%" src="${fileURL(f)}"></audio>`;
+ return `<button data-view="${escapeHTML(f.path)}">查看文件</button>`;
+}
+function uploadBox(folder){return `<div class="prompt"><label>导入本地图片 / 视频 / 声音<input type="file" id="media-upload" accept="image/*,video/*,audio/*"></label><p><small>目标目录：<span id="upload-folder">${escapeHTML(folder)}</span>。上传保留新版本，再选择采用。</small></p><button id="upload-button">上传到项目</button><p id="upload-result"></p></div>`;}
+function wireUpload(getFolder){
+ $('upload-button').onclick=async()=>{
+ const f=$('media-upload').files[0];if(!f){toast('请先选择文件');return;}
+ S.busy=true;$('upload-button').disabled=true;
+ try{const result=await request('/api/upload?folder='+encodeURIComponent(getFolder())+'&name='+encodeURIComponent(f.name),{method:'POST',headers:{'X-Review-Token':S.token,'Content-Type':'application/octet-stream'},body:f});toast('已导入：'+result.path);await sync(true);}
+ catch(e){toast(e.message);}finally{S.busy=false;if($('upload-button'))$('upload-button').disabled=false;}
+ };
+}
+function appendUnitTools(shot,kind){
+ const target=document.querySelector('.preview-layout').parentElement;
+ const folder=shot.config_path.split('/').slice(0,-1).join('/')+(kind==='video'?'/videos':'/images');
+ target.insertAdjacentHTML('beforeend',uploadBox(folder)+`<div class="prompt"><h3>本单元完整分镜</h3><div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px">${(shot.panels?.length?shot.panels:(shot.image?.hash?[shot.image]:[])).map((f,i)=>`<div><small>分镜 ${i+1}</small>${preview(f)}<small>${escapeHTML(f.path)}</small></div>`).join('')}</div></div><div class="prompt"><h3>实际 H3 参考输入</h3>${(shot.execution_references||[]).map(f=>`<div><p>${escapeHTML(({image:'Picture',video:'Video',audio:'Audio'})[f.kind]||f.kind)} ${escapeHTML(f.slot)} · ${escapeHTML(f.role)} ${escapeHTML(f.character_id||'')} ${escapeHTML(f.look_id||'')}</p>${preview(f)}<small>${escapeHTML(f.path)}</small></div>`).join('')}</div><div class="prompt"><h3>生成任务</h3>${(shot.jobs||[]).map(j=>`<p>${escapeHTML(j.id)} · ${escapeHTML(({queued:'等待提交',submitting:'正在提交',submitted:'已提交',running:'生成中',succeeded:'已下载，待验收',failed:'失败',stale:'输入已变，待重审',submission_unknown:'提交结果待核实'})[j.state]||j.state)} · ${j.input_current?'当前输入':'旧版输入'}<br><small>${escapeHTML(j.message||'')}</small></p>`).join('')||'审核通过后自动排队'}</div>`);
+ wireUpload(()=>folder);
+}
+function renderAssets(ep){
+ if(!ep){$('content').innerHTML='<p>请先创建分集。</p>';return;}
+ const files=S.data.files.filter(f=>f.path.startsWith('assets/'));
+ const folders=S.data.asset_folders||['assets/characters'];
+ $('content').innerHTML=`<div class="panel"><div class="panel-head"><h2>角色造型、声音与共享素材</h2>${badge(ep.assets_gate)}</div><div class="panel-body"><p>每个角色的身份、不同服装和声音保存在同一角色目录。Agent 负责绑定当前采用版本；下面可编辑角色配置、试听或上传。</p><label>上传目录 <select id="asset-folder">${folders.map(p=>`<option>${escapeHTML(p)}</option>`).join('')}</select></label>${uploadBox(folders[0]||'assets/characters')}<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:16px;margin-top:20px">${files.map(f=>`<div class="panel panel-body"><small class="mono">${escapeHTML(f.path)}</small>${preview(f)}${f.kind==='文本'?`<button data-edit="${escapeHTML(f.path)}">编辑</button>`:''}</div>`).join('')}</div><h3 style="margin-top:20px">本阶段实际审核的文件</h3>${ep.assets.map(f=>`<p class="mono">${escapeHTML(f.path)}</p>`).join('')||'<p>等待 Agent 登记素材；空列表只可在 Agent 明确声明无需素材时审核。</p>'}</div><div class="panel-foot">${reviewControls('assets',ep.assets_gate)}</div></div>`;
+ wireUpload(()=>$('asset-folder').value);
+ $('asset-folder').onchange=()=>{$('upload-folder').textContent=$('asset-folder').value;};
+}
+
+function renderFiles(){
+ $('content').innerHTML=`<div class="toolbar"><input id="file-search" type="search" placeholder="按文件路径、类型搜索" aria-label="搜索资产" value="${escapeHTML(S.query)}"></div><div class="file-summary">全部 ${S.data.files.length} 个文件。未被当前配置引用的文件仍保留在清单中，可能是历史版本或辅助文件。</div><div class="table-wrap"><table><thead><tr><th>相对路径</th><th>类型</th><th>大小</th><th>当前引用</th><th>内容指纹</th><th>操作</th></tr></thead><tbody id="file-rows"></tbody></table></div>`;
+ renderFileRows();
+}
+function renderFileRows(){
+ const rows=S.data.files.filter(f=>(f.path+' '+f.kind).toLowerCase().includes(S.query.toLowerCase()));
+ $('file-rows').innerHTML=rows.map(f=>`<tr><td class="path-cell">${escapeHTML(f.path)}</td><td>${escapeHTML(f.kind)}</td><td style="white-space:nowrap">${bytes(f.bytes)}</td><td>${f.referenced?'已引用':'未引用'}</td><td class="file-hash">${escapeHTML(f.hash?.slice(0,8))}</td><td class="actions"><a href="${fileURL(f)}" target="_blank" rel="noopener">打开</a>${f.kind==='文本'?` <button data-view="${escapeHTML(f.path)}">预览</button>${!f.path.startsWith('reviews/')?` <button data-edit="${escapeHTML(f.path)}">编辑</button>`:''}`:''}</td></tr>`).join('')||'<tr><td colspan="6" class="empty">没有匹配的文件</td></tr>';
+}
+async function openEditor(path,readOnly=false){
+ const meta=S.data?.files.find(f=>f.path===path);if(readOnly&&meta&&meta.kind!=='文本'){window.open(fileURL(meta),'_blank','noopener');return;}
+ try{const r=await request('/api/text?path='+encodeURIComponent(path));S.editing={path,hash:r.hash,original:r.text};S.dirty=false;$('editor-title').textContent=path;$('editor-text').value=r.text;$('viewer-text').textContent=r.text;$('editor-text').hidden=readOnly;$('viewer-text').hidden=!readOnly;$('editor-save').hidden=readOnly;$('editor-info').textContent=readOnly?'只读预览。所有路径相对项目根目录。':'保存前检查文件版本；原内容自动备份到 history 目录。';$('editor').showModal();}catch(e){toast(e.message);}
+}
+function closeEditor(){if(S.dirty&&!confirm('放弃尚未保存的修改？'))return;$('editor').close();S.editing=null;S.dirty=false;}
+async function performReview(stage,decision){
+ const ep=currentEpisode(),shot=currentShot();if(!ep)return;
+ if(stage==='board_all'&&!confirm('确认已查看本集所有分镜、图片、提示词与参数，并全部通过？'))return;
+ const fp=stage==='script'?ep.script_gate.fingerprint:stage==='assets'?ep.assets_gate.fingerprint:stage==='board_all'?ep.board_bundle_fingerprint:shot[stage==='board'?'board':'clip'].fingerprint;
+ if(decision==='rejected'&&!S.note.trim()){toast('请填写退回修改意见');return;}
+ await post({action:'review',episode:ep.id,shot:shot?.id,stage,decision,expected_fingerprint:fp,generate:stage==='board'&&decision==='approved',note:S.note,reviewer:'local-reviewer'});S.note='';toast(decision==='approved'?'已记录审核通过':'已退回，并保存修改意见');await sync(true);
+}
+async function selectVersion(kind){const shot=currentShot(),path=$('version').value;if(!shot||!path)return;await post({action:'select',episode:S.episode,shot:shot.id,kind,path,expected_hash:shot.config_hash});toast('当前采用版本已更新；原文件仍然保留');await sync(true);}
+async function navigate(update){if(S.note&&!confirm('切换后将清空尚未提交的审核意见，是否继续？'))return;S.note='';update();render();}
+
+document.addEventListener('click',async e=>{
+ const b=e.target.closest('button');if(!b||b.disabled||S.busy)return;
+ try{
+  if(b.dataset.tab)return navigate(()=>{S.tab=b.dataset.tab;});
+  if(b.dataset.episode)return navigate(()=>{S.episode=b.dataset.episode;S.shot=null;});
+  if(b.dataset.shot)return navigate(()=>{S.shot=b.dataset.shot;});
+  if(b.dataset.edit)return openEditor(b.dataset.edit);
+  if(b.dataset.view)return openEditor(b.dataset.view,true);
+  if(b.dataset.review||b.dataset.select){S.busy=true;b.disabled=true;try{if(b.dataset.review)await performReview(b.dataset.review,b.dataset.decision);else await selectVersion(b.dataset.select);}finally{S.busy=false;b.disabled=false;}}
+ }catch(err){toast(err.message);}
+});
+document.addEventListener('input',e=>{if(e.target.matches('[data-note]'))S.note=e.target.value;if(e.target.id==='file-search'){S.query=e.target.value;renderFileRows();}});
+$('editor-text').addEventListener('input',()=>{S.dirty=$('editor-text').value!==S.editing?.original;});
+$('editor-close').onclick=closeEditor;$('editor').addEventListener('cancel',e=>{e.preventDefault();closeEditor();});
+$('editor-save').onclick=async()=>{if(!S.editing)return;$('editor-save').disabled=true;try{await post({action:'save_text',path:S.editing.path,expected_hash:S.editing.hash,text:$('editor-text').value});S.dirty=false;closeEditor();toast('已保存。相关审核将按新的内容版本重新核对。');await sync(true);}catch(e){$('editor-info').textContent=e.message;toast(e.message);}finally{$('editor-save').disabled=false;}};
+$('rescan').onclick=async()=>{try{$('rescan').disabled=true;await post({action:'rescan'});await sync();toast('文件内容指纹已重新核对');}catch(e){toast(e.message);}finally{$('rescan').disabled=false;}};
+$('export').onclick=()=>{window.location.href='/api/files.csv';};
+$('apply-changes').onclick=()=>{if($('editor').open){toast('请先保存或关闭文件编辑器');return;}if(S.note&&!confirm('载入最新文件会清空未提交的审核意见，是否继续？'))return;S.note='';if(S.pending){S.data=S.pending;S.pending=null;$('changes').hidden=true;render();}else sync(true);};
+window.addEventListener('beforeunload',e=>{if(S.dirty||S.note){e.preventDefault();e.returnValue='';}});
+(async()=>{if(location.protocol==='file:'){showError('请先运行 python server.py --open。双击 HTML 不会获得本地 API。');$('connection').textContent='请通过本地服务打开';return;}try{S.token=(await request('/api/session')).token;await sync();setInterval(()=>{if(!document.hidden)sync();},2000);document.addEventListener('visibilitychange',()=>{if(!document.hidden)sync();});}catch(e){showError(e.message);}})();
+</script>
+</body>
+</html>

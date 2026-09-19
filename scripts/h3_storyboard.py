@@ -320,7 +320,7 @@ def compile_graph(doc, base, unit, input_dir=None):
         counts[kind] += 1
         slot = counts[kind]
         # Same-name assets cannot collide; hash and modality order remain explicit.
-        name = "tudou/" + unit["id"] + "/" + file_hash(path)[:16] + path.suffix.lower()
+        name = "h3-short-drama/" + unit["id"] + "/" + file_hash(path)[:16] + path.suffix.lower()
         if input_dir:
             dest = Path(input_dir) / name
             dest.parent.mkdir(parents=True, exist_ok=True)
@@ -358,7 +358,7 @@ def compile_graph(doc, base, unit, input_dir=None):
         "class_type": "SaveVideo",
         "inputs": {
             "video": [gen_id, 0],
-            "filename_prefix": "video/tudou/" + unit["id"],
+            "filename_prefix": "video/h3-short-drama/" + unit["id"],
             "format": "mp4",
             "format.codec": "auto",
         },

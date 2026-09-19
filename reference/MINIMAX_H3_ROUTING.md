@@ -1,4 +1,4 @@
-# MiniMax H3 Routing for Tudou Shotlist Builder
+# MiniMax H3 Routing for H3 Short Drama Workbench
 
 Use this file only after the user has selected **MiniMax H3** at the platform gate. The default delivery is a paired prompt for every unit: the Chinese director storyboard defined in `SKILL.md`, followed by the English six-section companion defined in `MINIMAX_H3_DUAL_PROMPT_CONTRACT.md` and `MINIMAX_H3_FULL_REFERENCE_EN.md`. `MINIMAX_H3_BASE_EN.md` remains the timing, keyframe, camera, dialogue, and sound source for both serializations.
 

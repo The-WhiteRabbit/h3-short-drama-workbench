@@ -1,13 +1,23 @@
 ---
-name: tudou-shotlist-builder-beta
-description: Build cinematic shotlists, managed production assets, image storyboard previews and paired Chinese/English prompt sheets from screenplays. Defaults to MiniMax H3 with the local ComfyUI vLLM-Omni Ref2VA workflow; supports asset versioning and provenance, image review, per-unit corrections, reference upload mapping and explicitly requested generation. Retains the optional Seedance 2.0 branch. Use for screenplay breakdown, asset organization, storyboard grids, production HTML or continuing an H3 unit.
+name: h3-short-drama-workbench
+description: Initialize a short-drama project in a user-specified directory with a local review server, character look and voice folders, and rolling H3 unit production. Use for screenplay breakdown, image2.5 or uploaded storyboard images, browser editing and review, direct H3 API video generation, or continuing a project. Agent handles writing; humans review by unit; no automatic editing. Retains explicit legacy ComfyUI and Seedance modes.
 ---
 
-# Tudou Shotlist Builder Beta
+# H3 Short Drama Workbench
 
-Act as co-director, cinematographer, editor, and performance director. Convert the screenplay into observable directing choices: dramatic units, spatial relationships, motivated framing and cuts, playable performance, exact speech, synchronized sound, and stable edit handoffs. Deliver one self-contained HTML file using [templates/HTML_TEMPLATE.md](templates/HTML_TEMPLATE.md). For H3, use the approved card-based production layout in [templates/H3_PRODUCTION_LAYOUT.md](templates/H3_PRODUCTION_LAYOUT.md): computed summary, unit navigation, visible storyboard planning, **an expanded upload-order checklist immediately before each unit's prompt pair**, shot timings, paired copy controls, boundaries, and postproduction text. This replaces the historical H3 table/house-layout freeze; Seedance retains its own template.
+## Default entry — initialize a local production project
 
-This local edition adds an image storyboard review stage to the existing text workflow. Read [reference/STORYBOARD_PREVIEW.md](reference/STORYBOARD_PREVIEW.md) for image generation, panel mapping, review and stale-approval handling. For the user's existing MiniMax execution path, read [reference/LOCAL_COMFYUI_MINIMAX.md](reference/LOCAL_COMFYUI_MINIMAX.md). Preview images do not become model inputs automatically. Skill maintenance is not permission to generate a film.
+Read [reference/LOCAL_PROJECT_WORKFLOW.md](reference/LOCAL_PROJECT_WORKFLOW.md) first for new H3 projects and project continuation. On invocation with a target directory, actually initialize the complete project structure and local review service, start it and open its URL. Reuse an existing project. If the directory is missing, ask for it before initialization. Skill maintenance does not start a film or spend generation quota.
+
+The default is `EXECUTION_ROUTE=newapi-h3-direct`: Agent reads and breaks down the script, prepares character/look prompts and one unit at a time, uses image2.5 or user-uploaded images for both looks and storyboards, and binds user-provided voices. Humans review script, assets, whole-unit storyboards, then whole-unit videos in the webpage. “通过本单元并生成” authorizes one H3 job and the local service submits it automatically. Do not ask again in chat. Do not fabricate human approvals.
+
+Keep only a compact whole-script plan; prepare at most one not-yet-approved detailed unit. Wait for the first sample video's approval before expansion, then pipeline H3 execution with preparation of the next unit. Do not generate every unit's prompts or images up front. Do not automatically assemble a film. Review edits and uploads persist to local project files. Agent continuation is explicit when the Agent is no longer active; the web server is not a background text model.
+
+The local-project reference takes precedence over legacy HTML delivery, all-scope detailed blueprint, separate chat approval and ComfyUI instructions below. Preserve the directing rules, truthful source coverage, reference binding and paired prompt contract for the current unit. Read only references needed for that stage.
+
+Act as co-director, cinematographer, editor, and performance director. Convert the screenplay into observable directing choices: dramatic units, spatial relationships, motivated framing and cuts, playable performance, exact speech, synchronized sound, and stable handoffs.
+
+For explicitly requested legacy/static delivery, use [templates/HTML_TEMPLATE.md](templates/HTML_TEMPLATE.md) and [templates/H3_PRODUCTION_LAYOUT.md](templates/H3_PRODUCTION_LAYOUT.md); legacy image review is documented in [reference/STORYBOARD_PREVIEW.md](reference/STORYBOARD_PREVIEW.md). Read [reference/LOCAL_COMFYUI_MINIMAX.md](reference/LOCAL_COMFYUI_MINIMAX.md) only when the user chooses ComfyUI. Preview images never become model inputs automatically.
 
 For every new production project, initialize and maintain one project-level `asset_manifest.json`; read [reference/ASSET_MANAGEMENT.md](reference/ASSET_MANAGEMENT.md). Give source, character, location, prop, style, audio, panel, prompt, workflow, generation, QA and deliverable files stable asset IDs. Record versions, current status, SHA-256, provenance, consuming units and generation attempts. `storyboard.json` references these IDs; ComfyUI hash-named input files remain execution caches rather than asset authority. Existing projects may register external files in place instead of duplicating originals.
 
@@ -19,7 +29,7 @@ Skill maintenance, source comparison, and template-only updates do not start a n
 
 ## Phase 0 — Lock the platform
 
-For this user's local workflow default `PROMPT_PLATFORM=MiniMax H3` and `EXECUTION_ROUTE=local-comfyui-ref2va`. An explicit platform selection is sufficient; do not ask the user to confirm it again. Preserve a requested Seedance branch. When the requested mode is unavailable on the current service, report the limitation instead of silently switching models or pretending references are exact first/last-frame controls.
+For this user's local workflow default `PROMPT_PLATFORM=MiniMax H3` and `EXECUTION_ROUTE=newapi-h3-direct`. An explicit platform selection is sufficient; do not ask the user to confirm it again. Preserve a requested Seedance branch. When the requested mode is unavailable on the current service, report the limitation instead of silently switching models or pretending references are exact first/last-frame controls.
 
 ## Phase 1 — Read and ground the entire script
 
@@ -33,7 +43,7 @@ For MiniMax H3, read these references before extraction:
 - [MINIMAX_H3_SOURCE_COVERAGE.md](reference/MINIMAX_H3_SOURCE_COVERAGE.md) for ordered `SOURCE_BEATS` and `PROP_STATE_CHAIN`.
 - [MINIMAX_H3_LONG_SCRIPT_UNITS.md](reference/MINIMAX_H3_LONG_SCRIPT_UNITS.md) for speech classification, `VOICE_BIBLE`, `POST_NODES`, and the full `H3_UNIT_BLUEPRINT`.
 
-Do not write H3 prompts while still discovering source beats. Finish the whole requested-scope blueprint first.
+Read the entire script before prompts. For local projects, finish a compact unit plan first and elaborate only the current unit. A complete detailed blueprint is for an explicitly requested full planning deliverable.
 
 Initialize the project asset layout before generating new media. Register the script and adopted source documents as `source` assets; do not mix generated attempts into the source folders.
 
@@ -140,7 +150,7 @@ For character-performance calibration or a flat-acting revision, apply its “AC
 
 For MiniMax H3, now complete the whole requested-scope `H3_UNIT_BLUEPRINT` from [MINIMAX_H3_LONG_SCRIPT_UNITS.md](reference/MINIMAX_H3_LONG_SCRIPT_UNITS.md). Present total unit count, estimated runtime, and a complete outline with each unit's duration, effective speech count, event, relationship turn, action chain, and exit state.
 
-For multi-unit, multi-scene, or full-film H3 work, build only the first unit as the calibration preview. Include its timing math, truth ledger, shot plan, voice evidence, English/Chinese prompts, scene shot ladder, and applicable boundary ledger. Complete Phase 3.5 images for that calibration unit before presenting one combined visual/prompt review for approval. Approval of the calibration authorizes expansion to the remaining scope; corrections require rerunning the calibration.
+For multi-unit, multi-scene, or full-film H3 work, build only the first unit as the calibration preview. Include its timing math, truth ledger, shot plan, voice evidence, English/Chinese prompts, scene shot ladder, and applicable boundary ledger. Complete Phase 3.5 images for that calibration unit before presenting one combined visual/prompt review for approval. In local-project mode, wait for the calibration video approval, then expand one unit at a time; corrections affect the current unit and its actual dependents.
 
 ## Phase 3.5 — Generate and review storyboard images (H3)
 
@@ -276,7 +286,7 @@ After calibration approval, preserve the approved calibration unit byte-for-byte
 
 Output one authoritative prompt pair per unit: the Chinese Director Storyboard first and the English six-section companion second. Keep original-language dialogue and visible text verbatim in both. Resolve the user's score policy first: a no-background-music instruction locks “无配乐。” / `non_diegetic_music: N/A` throughout the requested scope. Otherwise use the source or approved directing decision to choose silence or a concrete cue with instrumentation/texture, pulse, entry, and exit. Diegetic music stays inside the matching shot timeline in both serializations, only when supported by the source and not excluded by the user.
 
-### HTML delivery
+### HTML delivery (explicit legacy/static mode only)
 
 Assemble the selected branch with [templates/HTML_TEMPLATE.md](templates/HTML_TEMPLATE.md).
 
@@ -289,6 +299,8 @@ For H3, link the current image review page before each unit's upload checklist, 
 When the user requests revisions after delivery, edit and re-present the HTML rather than dumping replacement prompt text into chat.
 
 ## Phase 5 — Execute accepted H3 units when requested
+
+For the default local-project mode, use the review service and direct H3 worker described in [LOCAL_PROJECT_WORKFLOW.md](reference/LOCAL_PROJECT_WORKFLOW.md). The combined webpage approval-and-generate action is sufficient authorization. The following paragraph applies only to explicitly selected legacy ComfyUI mode.
 
 Use [reference/LOCAL_COMFYUI_MINIMAX.md](reference/LOCAL_COMFYUI_MINIMAX.md) to export or submit a unit through the existing local nodes. Exporting is not generation. A visual approval does not itself authorize paid generation. Reuse the user's existing generation authorization when it covers the current unit, parameters and scope; do not ask again. Persist the queue ID, query history, inspect the downloaded/saved video's duration, frames and sound, then use the existing boundary-contact-sheet script for adjacent clips. A queued or structurally valid workflow is not a successful film.
 

@@ -4,7 +4,7 @@ Use this reference when a MiniMax H3 shot keeps a human face or upper body reada
 
 ## 1. Parent-workflow authority
 
-The Tudou Shotlist Builder remains authoritative for:
+The H3 Short Drama Workbench remains authoritative for:
 
 - source truth, dialogue, blocking, prop state, and relationship turns;
 - H3 unit duration, internal cuts, and cross-clip continuity;

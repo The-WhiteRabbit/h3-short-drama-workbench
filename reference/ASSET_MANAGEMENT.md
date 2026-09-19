@@ -2,7 +2,13 @@
 
 每个项目维护一个 `asset_manifest.json`。它是人物、场景、声音、分镜、提示词、工作流和成片的统一台账；`storyboard.json` 只负责镜头与本次输入映射，不再承担整个项目的文件清单。
 
-## 推荐目录
+## 默认本地项目
+
+新项目使用 [LOCAL_PROJECT_WORKFLOW.md](LOCAL_PROJECT_WORKFLOW.md) 的初始化入口和目录：角色的 identity、looks、voice 集中在角色文件夹，单元放在 episodes/EPxxx/units/H3-xxx。服务维护同一份 asset_manifest.json，并为观察到的修改保存 history/catalog 中的不可变快照；人工审核结论独立保存在 reviews，不从 current 或生成成功推断。不要并行手改服务维护的台账。
+
+以下布局与手动 add 命令保留用于已有静态/ComfyUI 项目；新本地审核项目的路径必须位于项目内，不登记外部绝对路径。
+
+## 推荐目录（已有静态项目）
 
 ```text
 project/
