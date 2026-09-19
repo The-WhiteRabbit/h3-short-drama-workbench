@@ -5,15 +5,18 @@ Provides:
 - fixed HTML UI
 - dynamic asset scanning
 - review state persistence API
+- local media playback
 """
 
 from http.server import ThreadingHTTPServer, SimpleHTTPRequestHandler
 from pathlib import Path
 import json
+from urllib.parse import unquote
 from review_store import load_review, save_review
 from scanner import scan_assets
 
 ROOT = Path.cwd()
+MEDIA_ROOT = ROOT / "assets"
 
 
 class Handler(SimpleHTTPRequestHandler):
@@ -44,11 +47,23 @@ class Handler(SimpleHTTPRequestHandler):
             })
             return
 
+        if self.path.startswith("/media/"):
+            rel = unquote(self.path[len("/media/"):])
+            target = (MEDIA_ROOT / rel).resolve()
+            if not str(target).startswith(str(MEDIA_ROOT.resolve())):
+                self.send_json({"error": "invalid path"}, 403)
+                return
+            self.path = "/assets/" + rel
+            return super().do_GET()
+
         return super().do_GET()
 
     def do_POST(self):
         if self.path == "/api/review":
             payload = self.read_body()
+            if not payload.get("stage"):
+                self.send_json({"error": "stage required"}, 400)
+                return
             result = save_review(ROOT, payload)
             self.send_json(result)
             return
