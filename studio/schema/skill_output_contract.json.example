@@ -1,0 +1,7 @@
+{
+  "episode_manifest": "episode_manifest.json",
+  "shot_manifest": "shot.json",
+  "generation_request": "h3_job_request.json",
+  "generation_record": "generation_record.json",
+  "review_required": true
+}
