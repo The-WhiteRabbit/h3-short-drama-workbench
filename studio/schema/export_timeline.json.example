@@ -1,0 +1,10 @@
+{
+  "episode": "EP001",
+  "timeline": [
+    {
+      "shot_id": "SH001",
+      "asset": "clip_v002",
+      "approved": true
+    }
+  ]
+}
