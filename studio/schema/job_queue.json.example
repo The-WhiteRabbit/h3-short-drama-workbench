@@ -1,0 +1,13 @@
+{
+  "jobs": [
+    {
+      "id": "job_EP001_SH001",
+      "type": "video_generation",
+      "provider": "MiniMax-H3",
+      "status": "waiting",
+      "shot_id": "EP001-SH001",
+      "prompt_version": "v001",
+      "created_at": ""
+    }
+  ]
+}
