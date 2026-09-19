@@ -1,61 +1,59 @@
-"""Tudou Studio local review server.
+"""
+Tudou Studio local review server.
 
-Provides a fixed UI backend with dynamic local asset state.
+Provides:
+- fixed HTML UI
+- dynamic asset scanning
+- review state persistence API
 """
 
 from http.server import ThreadingHTTPServer, SimpleHTTPRequestHandler
 from pathlib import Path
 import json
-import hashlib
+from review_store import load_review, save_review
+from scanner import scan_assets
 
 ROOT = Path.cwd()
 
 
-def sha256_file(path: Path):
-    h = hashlib.sha256()
-    with path.open("rb") as f:
-        for chunk in iter(lambda: f.read(1024 * 1024), b""):
-            h.update(chunk)
-    return h.hexdigest()
-
-
-def scan_assets(folder: Path):
-    result = []
-    if not folder.exists():
-        return result
-    for p in folder.rglob("*"):
-        if p.is_file():
-            result.append({
-                "path": str(p.relative_to(folder)),
-                "size": p.stat().st_size,
-                "sha256": sha256_file(p)
-            })
-    return result
-
-
 class Handler(SimpleHTTPRequestHandler):
-    def send_json(self, data):
+    def send_json(self, data, code=200):
         body = json.dumps(data, ensure_ascii=False, indent=2).encode("utf-8")
-        self.send_response(200)
+        self.send_response(code)
         self.send_header("Content-Type", "application/json; charset=utf-8")
         self.send_header("Cache-Control", "no-store")
         self.end_headers()
         self.wfile.write(body)
 
+    def read_body(self):
+        length = int(self.headers.get("Content-Length", 0))
+        if not length:
+            return {}
+        return json.loads(self.rfile.read(length).decode("utf-8"))
+
     def do_GET(self):
         if self.path == "/api/health":
             self.send_json({"ok": True, "service": "tudou-studio"})
             return
-        if self.path == "/api/assets":
-            self.send_json(scan_assets(ROOT / "assets"))
-            return
+
         if self.path == "/api/project":
             self.send_json({
                 "root": str(ROOT),
-                "assets": scan_assets(ROOT / "assets")
+                "assets": scan_assets(ROOT / "assets"),
+                "review": load_review(ROOT)
             })
             return
+
         return super().do_GET()
+
+    def do_POST(self):
+        if self.path == "/api/review":
+            payload = self.read_body()
+            result = save_review(ROOT, payload)
+            self.send_json(result)
+            return
+
+        self.send_json({"error": "not found"}, 404)
 
 
 if __name__ == "__main__":
