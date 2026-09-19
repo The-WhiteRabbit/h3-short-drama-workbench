@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>Tudou Studio Review</title>
+<style>
+body{font-family:system-ui;margin:24px;background:#111;color:#eee}
+.grid{display:grid;grid-template-columns:240px 1fr 300px;gap:16px}
+.panel{background:#1b1b1b;padding:16px;border-radius:8px}
+button{padding:8px;margin:4px}
+</style>
+</head>
+<body>
+<h1>Tudou Studio Review</h1>
+<div class="grid">
+<div class="panel">
+<h3>项目</h3>
+<div>EP001</div>
+<div>SH001</div>
+</div>
+<div class="panel">
+<h3>镜头</h3>
+<p id="status">等待加载资产</p>
+</div>
+<div class="panel">
+<h3>审核</h3>
+<button>通过剧本</button>
+<button>通过分镜</button>
+<button>采用视频</button>
+</div>
+</div>
+<script>
+fetch('/api/assets').then(r=>r.json()).then(x=>{
+ document.getElementById('status').innerText='资产数量: '+x.length;
+});
+</script>
+</body>
+</html>
