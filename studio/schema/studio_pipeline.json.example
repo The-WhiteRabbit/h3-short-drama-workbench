@@ -1,0 +1,24 @@
+{
+  "pipeline": [
+    {
+      "stage": "script",
+      "output": "episode_manifest.json",
+      "review_required": true
+    },
+    {
+      "stage": "storyboard",
+      "output": "shot.json",
+      "review_required": true
+    },
+    {
+      "stage": "generation",
+      "output": "generation_record.json",
+      "review_required": false
+    },
+    {
+      "stage": "clip_selection",
+      "output": "selection.json",
+      "review_required": true
+    }
+  ]
+}
