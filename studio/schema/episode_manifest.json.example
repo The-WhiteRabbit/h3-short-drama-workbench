@@ -1,0 +1,17 @@
+{
+  "episode": "EP001",
+  "title": "",
+  "script": {
+    "file": "script.md",
+    "review": "pending"
+  },
+  "shots": [
+    {
+      "id": "EP001-SH001",
+      "order": 1,
+      "storyboard_review": "pending",
+      "clip_review": "pending",
+      "selected_clip": null
+    }
+  ]
+}
