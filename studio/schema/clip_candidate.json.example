@@ -1,0 +1,18 @@
+{
+  "shot_id": "EP001-SH001",
+  "candidates": [
+    {
+      "id": "clip_v001",
+      "file": "videos/take_v001.mp4",
+      "prompt_version": "p001",
+      "status": "candidate"
+    },
+    {
+      "id": "clip_v002",
+      "file": "videos/take_v002.mp4",
+      "prompt_version": "p002",
+      "status": "selected"
+    }
+  ],
+  "selected": "clip_v002"
+}
