@@ -1,13 +1,6 @@
-"""
-Tudou Studio local review server.
+"""Tudou Studio local review server.
 
-Responsibilities:
-- Serve fixed HTML UI.
-- Read project manifests dynamically.
-- Detect asset changes without rebuilding HTML.
-- Keep human review state separate from generated files.
-
-This is the first implementation layer. Production adapters for MiniMax H3 and ComfyUI will be added separately.
+Provides a fixed UI backend with dynamic local asset state.
 """
 
 from http.server import ThreadingHTTPServer, SimpleHTTPRequestHandler
@@ -41,14 +34,26 @@ def scan_assets(folder: Path):
 
 
 class Handler(SimpleHTTPRequestHandler):
+    def send_json(self, data):
+        body = json.dumps(data, ensure_ascii=False, indent=2).encode("utf-8")
+        self.send_response(200)
+        self.send_header("Content-Type", "application/json; charset=utf-8")
+        self.send_header("Cache-Control", "no-store")
+        self.end_headers()
+        self.wfile.write(body)
+
     def do_GET(self):
+        if self.path == "/api/health":
+            self.send_json({"ok": True, "service": "tudou-studio"})
+            return
         if self.path == "/api/assets":
-            body = json.dumps(scan_assets(ROOT / "assets"), ensure_ascii=False).encode()
-            self.send_response(200)
-            self.send_header("Content-Type", "application/json")
-            self.send_header("Cache-Control", "no-store")
-            self.end_headers()
-            self.wfile.write(body)
+            self.send_json(scan_assets(ROOT / "assets"))
+            return
+        if self.path == "/api/project":
+            self.send_json({
+                "root": str(ROOT),
+                "assets": scan_assets(ROOT / "assets")
+            })
             return
         return super().do_GET()
 
