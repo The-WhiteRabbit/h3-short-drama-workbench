@@ -1,0 +1,14 @@
+{
+  "api": {
+    "project": "GET /api/project",
+    "jobs": ["GET /api/jobs", "POST /api/jobs"],
+    "candidates": "GET /api/candidates",
+    "select": "POST /api/select",
+    "review": "POST /api/review",
+    "export": "POST /api/export"
+  },
+  "rule": {
+    "human_review_required": true,
+    "asset_version_required": true
+  }
+}
