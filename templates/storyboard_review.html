@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="zh-CN"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>H3 分镜审阅</title>
+<style>
+:root{color-scheme:dark;font:16px/1.6 system-ui,sans-serif;background:#101923;color:#e5e9ed}*{box-sizing:border-box}
+body{max-width:1320px;margin:auto;padding:30px}h1{font-size:30px;margin:0}h2{color:#e6c493}p{color:#bdcbd5}a{color:#9ed8db}
+header{padding-bottom:22px;border-bottom:1px solid #425361}nav{display:flex;gap:10px;flex-wrap:wrap;margin:20px 0}
+button,select,input,textarea{font:inherit}button,select{border:1px solid #607482;background:#1c2a36;color:inherit;border-radius:7px;padding:9px 14px;cursor:pointer}
+button:hover{background:#304452}button:disabled{opacity:.4;cursor:not-allowed}label{display:inline-flex;gap:8px;align-items:center}input{accent-color:#e6c493}
+article{margin:30px 0;padding:22px;border:1px solid #425361;border-radius:12px;background:#16232e}
+.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}.panel{min-width:0;border:1px solid #425361;border-radius:8px;overflow:hidden}
+.frame{aspect-ratio:var(--ratio);background:#0b1219;display:flex;align-items:center;justify-content:center}.frame img{width:100%;height:100%;object-fit:contain}
+.caption{padding:12px}.caption strong{color:#e6c493}.caption p{font-size:14px;margin:6px 0}.missing{color:#ffc28b}
+.empty{color:#748694}.toolbar{display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin:16px 0}
+.toolbar label{flex-wrap:wrap}.toolbar label span{white-space:nowrap}.toolbar input[type=file]{width:230px;max-width:100%;min-width:0}
+textarea{width:100%;min-height:85px;background:#101923;color:inherit;border:1px solid #607482;border-radius:6px;padding:12px}
+pre{white-space:pre-wrap;overflow-wrap:anywhere;background:#101923;padding:15px;font:14px/1.6 ui-monospace,monospace}
+.refs{padding-left:23px;overflow-wrap:anywhere}.refs img{max-width:120px;max-height:65px;vertical-align:middle;margin:6px 10px}
+.issues{color:#ffc28b}details{margin-top:14px}.pill{color:#e6c493;font-size:14px}#notice{position:sticky;bottom:10px;background:#243b49;padding:10px;border-radius:8px;display:none}
+@media(max-width:650px){body{padding:12px}article{padding:12px}.grid{grid-template-columns:1fr}h1{font-size:24px}.toolbar{align-items:stretch}}
+@media print{button,textarea,.toolbar{display:none}body{max-width:none}article{break-before:page}.grid{grid-template-columns:repeat(3,1fr)}}
+</style>
+<header><span class="pill">TU DOU · MINIMAX H3</span><h1 id="title"></h1>
+<p>先检查画面与镜头，再确认本段。审阅图用于看构图和连续性；实际上传素材在每段下方单独列出。</p>
+<div class="toolbar"><button id="save">保存审核意见</button><label><span>恢复意见</span> <input id="restore" type="file" accept="application/json"></label><button onclick="window.print()">打印</button></div>
+<p>勾选后请保存意见文件，回到对话说明通过的单元。此页面不提交视频，也不自动修改源文件。</p></header>
+<nav id="nav"></nav><main id="main"></main><div id="notice" role="status"></div>
+<script id="data" type="application/json">__STORYBOARD_DATA__</script>
+<script>
+const data=JSON.parse(document.querySelector('#data').textContent), states=new Map(); let dirty=false;
+const el=(tag,text,cls)=>{const n=document.createElement(tag);if(text!==undefined)n.textContent=text;if(cls)n.className=cls;return n};
+function say(text){const n=document.querySelector('#notice');n.textContent=text;n.style.display='block'}
+function download(blob,name){const a=el('a');a.href=URL.createObjectURL(blob);a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)}
+document.title=data.title+' · 分镜审阅'; document.querySelector('#title').textContent=data.title;
+for(const u of data.units){
+ const state={unit_id:u.id,snapshot:u.snapshot,decision:'revise',checked_panels:[],notes:''};states.set(u.id,state);
+ const a=el('a',u.id);a.href='#'+u.id;document.querySelector('#nav').append(a);
+ const art=el('article');art.id=u.id;art.append(el('h2',u.id+' · '+u.duration+' 秒'),el('p',u.scene||''));
+ if(u.problems.length){art.append(el('p','待补齐，当前不可确认：'+u.problems.join('；'),'issues'))}
+ const grid=el('div',undefined,'grid');grid.style.setProperty('--ratio',data.video.width+'/'+data.video.height);
+ const boxes=[];
+ for(let i=0;i<Math.ceil(u.panels.length/9)*9;i++){
+  const p=u.panels[i], card=el('div',undefined,'panel'), frame=el('div',undefined,'frame');card.append(frame);
+  if(!p){frame.append(el('span','空位 · 不代表新增镜头','empty'));grid.append(card);continue}
+  let valid=!!p.src;
+  if(p.src){const im=el('img');im.src=p.src;im.alt=p.visual||p.id;im.addEventListener('error',()=>{valid=false;box.checked=false;box.disabled=true;state.checked_panels=state.checked_panels.filter(x=>x!==p.id);choice.value='revise';state.decision='revise';dirty=true;say('图片无法解码，请修复后重新审阅')});frame.append(im)}
+  else frame.append(el('span','待生成分镜图','missing'));
+  const caption=el('div',undefined,'caption');caption.append(el('strong',p.id+' · '+p.shot_id+' · '+p.at+'s'),el('p',p.visual||''),el('p',p.continuity||''));
+  const label=el('label','此格已检查'),box=document.createElement('input');box.type='checkbox';box.disabled=!valid||u.problems.length>0;box.dataset.panel=p.id;
+  box.onchange=()=>{state.checked_panels=boxes.filter(b=>b.checked).map(b=>b.dataset.panel);if(!box.checked){choice.value='revise';state.decision='revise'}dirty=true};label.prepend(box);caption.append(label);boxes.push(box);card.append(caption);grid.append(card);
+ }
+ art.append(grid);
+ const bar=el('div',undefined,'toolbar'),png=el('button','下载审阅宫格 PNG');png.disabled=u.panels.some(p=>!p.src);
+ png.onclick=async()=>{try{await saveGrid(u)}catch(e){say('导出失败：'+e.message)}};
+ const choice=el('select');choice.setAttribute('aria-label',u.id+' 审核结论');
+ for(const [v,t] of [['revise','需要修改 / 尚未确认'],['approved','本段通过']]){const o=el('option',t);o.value=v;choice.append(o)}
+ choice.disabled=u.problems.length>0;
+ choice.onchange=()=>{if(choice.value==='approved'&&(state.checked_panels.length!==u.panels.length||state.notes.trim())){choice.value='revise';say('请检查所有格子并处理返工意见')}state.decision=choice.value;dirty=true};
+ bar.append(png,choice);art.append(bar);
+ const notes=el('textarea');notes.placeholder='按镜号记录修改，例如：S02 视线应朝画面右侧。';notes.setAttribute('aria-label',u.id+' 返工意见');
+ notes.oninput=()=>{state.notes=notes.value;if(notes.value.trim()){choice.value='revise';state.decision='revise'}dirty=true};art.append(notes);
+ art.append(el('h3','实际上传顺序（与上方预览分开）'));
+ const refs=el('ol',undefined,'refs'),counts={image:0,video:0,audio:0};
+ for(const r of u.references){counts[r.kind]++;const li=el('li',r.kind+' '+counts[r.kind]+' · '+r.label+' · '+r.role+(r.target?' · '+r.target:''));if(r.src){const im=el('img');im.src=r.src;im.alt=r.role;li.prepend(im)}li.append(el('div',r.path));refs.append(li)}art.append(refs);
+ for(const [key,title] of [['prompt_zh','中文导演分镜'],['prompt_en','英文六段式 · ComfyUI 使用此版']]){const det=el('details'),pre=el('pre',u.prompts[key]),copy=el('button','复制');copy.onclick=async()=>{try{await navigator.clipboard.writeText(pre.textContent);say('已复制')}catch{const range=document.createRange();range.selectNodeContents(pre);const selection=getSelection();selection.removeAllRanges();selection.addRange(range);say('已选中文字，请手动复制')}};det.append(el('summary',title),copy,pre);art.append(det)}
+ document.querySelector('#main').append(art);
+}
+async function saveGrid(u){
+ const w=640,h=Math.round(w*data.video.height/data.video.width),gap=12,label=48,rows=Math.ceil(u.panels.length/9)*3;
+ const c=document.createElement('canvas');c.width=w*3+gap*4;c.height=(h+label+gap)*rows+gap;const ctx=c.getContext('2d');ctx.fillStyle='#101923';ctx.fillRect(0,0,c.width,c.height);
+ for(let i=0;i<u.panels.length;i++){const p=u.panels[i];if(!p.src)throw Error('仍有缺图');const im=new Image();im.src=p.src;await im.decode();const x=gap+(i%3)*(w+gap),y=gap+Math.floor(i/3)*(h+label+gap),scale=Math.min(w/im.width,h/im.height);ctx.drawImage(im,x+(w-im.width*scale)/2,y+(h-im.height*scale)/2,im.width*scale,im.height*scale);ctx.fillStyle='#e5e9ed';ctx.font='20px sans-serif';ctx.fillText(p.id+' · '+p.shot_id+' · '+p.at+'s',x,y+h+30,w)}
+ const blob=await new Promise(r=>c.toBlob(r,'image/png'));if(!blob)throw Error('无法编码 PNG');download(blob,u.id+'-review-only.png');say('已导出审阅图；不是 MiniMax 首帧素材');
+}
+document.querySelector('#save').onclick=()=>{download(new Blob([JSON.stringify({schema_version:1,units:[...states.values()]},null,2)],{type:'application/json'}),'storyboard-review.json');dirty=false;say('已保存意见；回到对话说明通过范围')};
+document.querySelector('#restore').onchange=async e=>{try{const parsed=JSON.parse(await e.target.files[0].text());if(!Array.isArray(parsed.units))throw Error('格式错误');const seen=new Set();for(const r of parsed.units){const old=states.get(r.unit_id);if(!old||old.snapshot!==r.snapshot||seen.has(r.unit_id)||typeof r.notes!=='string')throw Error('版本/范围不符');seen.add(r.unit_id)}for(const r of parsed.units){const s=states.get(r.unit_id);s.notes=r.notes;s.decision='revise';s.checked_panels=[];const art=document.getElementById(r.unit_id);art.querySelector('textarea').value=r.notes;art.querySelector('select').value='revise';art.querySelectorAll('input[type=checkbox]').forEach(b=>b.checked=false)}dirty=true;say('已恢复意见；图片需要重新勾选确认')}catch(err){say('恢复失败：'+err.message)}};
+window.addEventListener('beforeunload',e=>{if(dirty){e.preventDefault();e.returnValue=''}});
+</script></html>
