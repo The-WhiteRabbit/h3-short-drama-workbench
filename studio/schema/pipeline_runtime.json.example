@@ -1,0 +1,13 @@
+{
+  "pipeline": {
+    "script_review": "pending",
+    "storyboard_review": "pending",
+    "generation": "waiting",
+    "clip_review": "pending",
+    "export": "blocked"
+  },
+  "rules": {
+    "require_human_approval": true,
+    "replace_without_version": false
+  }
+}
