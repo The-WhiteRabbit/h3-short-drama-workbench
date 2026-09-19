@@ -1,0 +1,8 @@
+{
+  "type": "video_generation",
+  "provider": "MiniMax-H3",
+  "shot_id": "EP001-SH001",
+  "prompt_file": "prompts/video.md",
+  "references": [],
+  "status": "waiting"
+}
