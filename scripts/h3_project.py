@@ -34,7 +34,7 @@ def init(root, title, script=None):
         (root / folder).mkdir(parents=True, exist_ok=True)
     shutil.copytree(RUNTIME, root / 'service', ignore=shutil.ignore_patterns('__pycache__', 'test_*.py'))
     put_new(root, 'project.json', {'schema_version': 2, 'project_id': root.name, 'title': title,
-        'automation': {'paused': False, 'max_jobs': 100, 'max_pending_units': 1, 'pilot_first': True},
+        'automation': {'paused': False, 'max_jobs': 100, 'pilot_first': True, 'active_batch': []},
         'video_route': 'newapi-h3-direct', 'image_route': 'image2.5-or-manual', 'audio_route': 'manual',
         'editing': False})
     put_new(root, 'asset_manifest.json', {'schema_version': 1, 'project_id': root.name, 'title': title, 'assets': [], 'generations': []})
@@ -45,8 +45,9 @@ def init(root, title, script=None):
 
 - 创作 Skill：{SKILL / 'SKILL.md'}
 - 本项目采用 `reference/LOCAL_PROJECT_WORKFLOW.md` 的滚动单元流程，优先于旧的静态 HTML / ComfyUI 流程。
-- 先完整阅读 sources，再写精简 plan.json；最多一个未通过分镜审核的详细单元。首个单元视频验收后再扩展。
+- 先完整阅读 sources，再写精简 plan.json；首个单元视频验收后可按当前批次连续准备多个待审单元，不一次性展开全剧。单镜头用单图，多镜头用各镜头第一帧组成九宫格，未使用格留空。
 - 角色的 identity、looks/LOOKxx、voice 放在同一个角色目录。声音由用户提供；造型和分镜图由 image2.5 或用户导入。
+- 新单元使用包含集号的全项目唯一编号，如 EP001-U001。样片之后先用 batch 命令登记本次范围，不自行扩大批次。
 - 人工结论以 reviews 为准；Agent 不得自行写通过记录。单元图和提示词在网页整体审核，通过并生成即授权一次 H3 任务。
 - Agent 创作文件原子写入，保留人工修改；通过后不原地覆盖。服务维护 jobs、reviews、asset_manifest.json。
 - 运行：`python3 service/workbench.py --open`（在项目根目录）。状态：访问 /api/project 或 Skill 的 h3_project.py status。
@@ -92,24 +93,32 @@ def unit(root, eid, uid, title):
     ident(eid); ident(uid)
     p = Project(root)
     state = p.snapshot(True)
+    if state['errors']:
+        raise ValueError('项目配置错误：' + '；'.join(state['errors']))
     ep = p.episode(state, eid)
     if ep['script_gate']['state'] != 'approved' or ep['assets_gate']['state'] != 'approved':
         raise ValueError('先完成剧本和素材阶段审核')
     built = [(e, s) for e in state['episodes'] for s in e['shots']]
-    if any(s['board']['state'] != 'approved' for e, s in built):
-        raise ValueError('已有待审单元；最多只展开一个详细单元')
     if built and state['project']['automation']['pilot_first'] and built[0][1]['clip']['state'] != 'approved':
         raise ValueError('先验收首个样片视频，再准备下一单元')
+    if uid in {s['id'] for e, s in built} or uid in {e['id'] for e in state['episodes']}:
+        raise ValueError('单元 ID 必须全项目唯一；建议使用 EP001-U001')
+    batch = state['project']['automation'].get('active_batch')
+    if batch is not None and (built or batch) and f'{eid}/{uid}' not in batch:
+        raise ValueError('该单元不在当前制作批次，请先用 batch 命令明确范围')
     plan = p.read_json('plan.json')['units']
     known = {(e['id'], s['id']) for e, s in built}
-    nxt = next((u for u in plan if (u['episode'], u['id']) not in known), None)
+    nxt = next((u for u in plan if (u['episode'], u['id']) not in known and (not batch or f"{u['episode']}/{u['id']}" in batch)), None)
     if not nxt or (nxt['episode'], nxt['id']) != (eid, uid):
         raise ValueError('只能展开 plan.json 中下一个未制作单元')
+    shot_count = nxt.get('shot_count', 1)
+    if type(shot_count) is not int or shot_count < 1:
+        raise ValueError('shot_count 必须为正整数')
     prefix = f'episodes/{eid}/units/{uid}'
     if (root / prefix).exists():
         raise ValueError('单元已存在')
     put_new(root, prefix + '/unit.json', {'id': uid, 'order': len(ep['shots']) + 1, 'title': title,
-        'description': '', 'duration_seconds': nxt.get('duration_seconds', 0), 'ready': False,
+        'description': '', 'duration_seconds': nxt.get('duration_seconds', 0), 'shot_count': shot_count, 'ready': False,
         'files': {'image_prompt': prefix + '/prompts/image.md', 'video_prompt': prefix + '/prompts/video_en.md',
                   'params': prefix + '/params.json'},
         'references': [prefix + '/prompts/video_zh.md'], 'panels': [],
@@ -121,6 +130,17 @@ def unit(root, eid, uid, title):
         'references': []})
     for folder in ('images', 'panels', 'videos'):
         (root / prefix / folder).mkdir()
+
+
+def batch(root, members):
+    p = Project(root)
+    plan = p.read_json('plan.json').get('units', [])
+    known = {f"{u['episode']}/{u['id']}" for u in plan}
+    if len(members) != len(set(members)) or any(x not in known for x in members):
+        raise ValueError('批次必须列出 plan.json 中不重复的 分集/单元 ID')
+    config = p.read_json('project.json')
+    config['automation']['active_batch'] = members
+    p.put_json('project.json', config)
 
 
 def status(root):
@@ -166,7 +186,7 @@ def start(root, port):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     sub = parser.add_subparsers(dest='command', required=True)
-    for cmd in ('init', 'start', 'status', 'episode', 'character', 'unit'):
+    for cmd in ('init', 'start', 'status', 'episode', 'character', 'unit', 'batch', 'deliver'):
         p = sub.add_parser(cmd)
         p.add_argument('project', type=Path)
         if cmd in {'init', 'episode', 'unit'}:
@@ -176,6 +196,8 @@ def main():
         if cmd == 'init':
             p.add_argument('--script', type=Path)
             p.add_argument('--start', action='store_true')
+        if cmd == 'batch':
+            p.add_argument('--units', nargs='*', required=True)
         if cmd == 'episode':
             p.add_argument('--id', required=True)
         if cmd == 'character':
@@ -197,6 +219,10 @@ def main():
             episode(root, args.id, args.title)
         elif args.command == 'character':
             character(root, args.id, args.name, args.looks)
+        elif args.command == 'batch':
+            batch(root, args.units)
+        elif args.command == 'deliver':
+            print(json.dumps(Project(root).export_approved(), ensure_ascii=False, indent=2))
         elif args.command == 'unit':
             unit(root, args.episode, args.id, args.title)
     except (ValueError, OSError) as exc:
